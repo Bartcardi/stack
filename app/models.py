@@ -12,10 +12,11 @@ class DB(object):
     """
     A STACK wrapper to handle recurring interactions with MongoDB
     """
-    def __init__(self, local=True):
+    def __init__(self, local=False):
         
         if local:
         # Class instance connection to Mongo
+            print 'Apparently I am local'
             self.connection = MongoClient()
     
             if config.AUTH:
@@ -37,6 +38,10 @@ class DB(object):
                 except:
                     print('Error: Authentication failed at the central server. Please check:\n1. MongoDB credentials in config.py\n2. MongoDB uses the correct authentication schema (MONGODB-CR)\nFor more info. see https://github.com/bitslabsyr/stack/wiki/Installation')
                     sys.exit(1)
+            
+            # App-wide config file for project info access
+            self.config_db = self.connection.config
+            self.stack_config = self.config_db.config
 
     def create(self, project_name, password, hashed_password, description=None,
                admin=False, email=None):

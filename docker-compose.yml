@@ -1,0 +1,27 @@
+version: '2.1'
+services:
+    mongo:
+        build: ./images/mongo_healthcheck
+        command: --noauth
+        healthcheck:
+            test: ["CMD", "mongo-healthcheck"]
+            interval: 10s
+            timeout: 3s
+            retries: 3
+    stack:
+        image: tno/stack
+        depends_on: 
+            mongo:
+                condition: service_healthy
+        links:
+            - mongo
+        # Uncomment this if you want to mount the repository in a container in 
+        # order to quickly test changes.
+        # volumes:
+        #     - ./:/stack
+        entrypoint: python __main__.py
+        # I know this is not an implemented flag, but could be ;)
+        command: --help
+        
+        # TO DEBUG inside stack container, leave it running for a long time
+        # command: python -c "import time; time.sleep(600)"
